@@ -1,0 +1,51 @@
+﻿@page "/courses/details"
+@inject BlazorApp1.Data.ApplicationDbContext DB
+@using BlazorApp1.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h4>Courses</h4>
+    <hr />
+    @if (courses is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Name</dt>
+            <dd class="col-sm-10">@courses.Name</dd>
+            <dt class="col-sm-2">Description</dt>
+            <dd class="col-sm-10">@courses.Description</dd>
+            <dt class="col-sm-2">Amount</dt>
+            <dd class="col-sm-10">@courses.Amount</dd>
+            <dt class="col-sm-2">CreatedDate</dt>
+            <dd class="col-sm-10">@courses.CreatedDate</dd>
+        </dl>
+        <div>
+            <a href="@($"/courses/edit?id={courses.ID}")">Edit</a> |
+            <a href="@($"/courses")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    Courses? courses;
+
+    [SupplyParameterFromQuery]
+    public int ID { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        courses = await DB.Courses.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (courses is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

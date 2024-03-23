@@ -1,0 +1,26 @@
+﻿@page "/courses"
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.QuickGrid
+@inject BlazorApp1.Data.ApplicationDbContext DB
+@using BlazorApp1.Models
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="courses/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="DB.Courses">
+    <PropertyColumn Property="courses => courses.Name" Title ="Course Name" Sortable="true"/>
+    <PropertyColumn Property="courses => courses.Description" />
+    <PropertyColumn Property="courses => courses.Amount" />
+    <PropertyColumn Property="courses => courses.CreatedDate" Title="Created Date" Format="yyyy/MM/dd" Sortable="true" />
+
+    <TemplateColumn Context="courses">
+        <a href="@($"courses/edit?id={courses.ID}")">Edit</a> |
+        <a href="@($"courses/details?id={courses.ID}")">Details</a> |
+        <a href="@($"courses/delete?id={courses.ID}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>

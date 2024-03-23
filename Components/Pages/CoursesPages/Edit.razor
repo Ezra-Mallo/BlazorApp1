@@ -1,0 +1,101 @@
+﻿@page "/Courses/edit"
+@inject BlazorApp1.Data.ApplicationDbContext DB
+@using BlazorApp1.Models
+@inject NavigationManager NavigationManager
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h4>Courses</h4>
+<hr />
+@if (Courses is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Courses" OnValidSubmit="UpdateCourses" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <input type="hidden" name="Courses.ID" value="@Courses.ID" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Courses.Name" class="form-control" />
+                    <ValidationMessage For="() => Courses.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Courses.Description" class="form-control" />
+                    <ValidationMessage For="() => Courses.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <InputNumber id="amount" @bind-Value="Courses.Amount" class="form-control" />
+                    <ValidationMessage For="() => Courses.Amount" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createddate" class="form-label">CreatedDate:</label>
+                    <InputDate id="createddate" @bind-Value="Courses.CreatedDate" class="form-control" />
+                    <ValidationMessage For="() => Courses.CreatedDate" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/courses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int ID { get; set; }
+
+    [SupplyParameterFromForm]
+    public Courses? Courses { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Courses ??= await DB.Courses.FirstOrDefaultAsync(m => m.ID == ID);
+
+        if (Courses is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more details, see https://aka.ms/RazorPagesCRUD.
+    public async Task UpdateCourses()
+    {
+        DB.Attach(Courses!).State = EntityState.Modified;
+
+        try
+        {
+            await DB.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!CoursesExists(Courses!.ID))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/courses");
+    }
+
+    bool CoursesExists(int id)
+    {
+        return DB.Courses.Any(e => e.ID == id);
+    }
+}

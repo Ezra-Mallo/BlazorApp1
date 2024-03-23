@@ -1,0 +1,58 @@
+﻿@page "/courses/create"
+@inject BlazorApp1.Data.ApplicationDbContext DB
+@using BlazorApp1.Models
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h4>Courses</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Courses" OnValidSubmit="AddCourses" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Courses.Name" class="form-control" /> 
+                <ValidationMessage For="() => Courses.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="description" class="form-label">Description:</label> 
+                <InputText id="description" @bind-Value="Courses.Description" class="form-control" /> 
+                <ValidationMessage For="() => Courses.Description" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="amount" class="form-label">Amount:</label> 
+                <InputNumber id="amount" @bind-Value="Courses.Amount" class="form-control" /> 
+                <ValidationMessage For="() => Courses.Amount" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createddate" class="form-label">CreatedDate:</label> 
+                <InputDate id="createddate" @bind-Value="Courses.CreatedDate" class="form-control" /> 
+                <ValidationMessage For="() => Courses.CreatedDate" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/courses">Back to List</a>
+</div>
+
+@code {
+
+    [SupplyParameterFromForm]
+    public Courses Courses { get; set; } = new();
+
+    // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+    public async Task AddCourses()
+    {
+        DB.Courses.Add(Courses);
+        await DB.SaveChangesAsync();
+        NavigationManager.NavigateTo("/courses");
+    }
+}
